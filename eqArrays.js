@@ -1,45 +1,42 @@
-const assertEqual = function(actual, expected) {
-  if (actual === expected) {
-    console.log(`✅✅✅ Assertion Passed: ${actual} + === ${expected}`);
-  } else {
-    console.log(`⛔⛔⛔ Assertion Failed: ${actual} + !== ${expected}`);
+const assertEqual = require('./assertEqual');
+
+//helper function to check for nested arrays
+const checkForNestArrays = (arr1) => {
+  if (!Array.isArray(arr1)) {
+    return false;
+  }
+
+  for (const element of arr1) {
+    if (Array.isArray(element)) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const eqArrays = (arr1, arr2) => {
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+
+  if (checkForNestArrays(arr1) !== checkForNestArrays(arr2)) {
+    return false;
+  }
+
+  for (const index in arr1) {
+    let element1 = arr1[index];
+    let element2 = arr2[index];
+    if (!Array.isArray(element1)) {
+      if (element1 !== element2) {
+        return false;
+      } else {
+        arr1.slice(index, 1);
+        arr2.slice(index, 1);
+      }
+    } else {
+      return eqArrays(element1, element2);
+    }
   }
 };
 
-//Implement a function eqArrays which takes in two arrays and returns true or false, based on a perfect match.
-const eqArrays = function(arr1, arr2) {
-  //make sure length is the same
-  if (arr1.length === arr2.length) {
-    //for loop to make sure each element matches in the right spot
-    for (let i = 0; i < arr1.length; i ++) {
-      if (arr1[i] !== arr2[i]) {
-        return false;
-      }
-    }
-  } else {
-    return false;
-  }
-  //if none of the false cases were satisfied, then equality is maintained between arr1 and arr2
-  return true;
-}
-
-//Test cases:
-//Equality
-let a1 = [1,2]
-let a2 = a1;
-assertEqual(eqArrays(a1, a2), true);
-//Different lengths
-a2 = [1];
-assertEqual(eqArrays(a1, a2), false);
-//One element doesnt match
-let txt1 = ['h', 'l', 'j'];
-let txt2 = ['l', 'j'];
-assertEqual(eqArrays(txt1, txt2), false);
-//Capital vs lowercase
-txt1 = ['H', 'J'];
-txt2 = ['h', 'j'];
-assertEqual(eqArrays(txt1, txt2), false);
-//Empty and full
-let arr = ['h'];
-let arrr = [''];
-assertEqual(eqArrays(arr, arrr), false);
+module.exports = eqArrays;
